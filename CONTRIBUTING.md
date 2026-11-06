@@ -21,22 +21,30 @@ npm pack --dry-run
 ## 分发方式
 
 本仓库本身就是一个可安装的 bundle（根目录 `package.json` 声明 `dsh.bundle.patch`），
-**没有额外打包步骤**。别人可以用任一方式安装：
+**没有额外打包步骤**，也没有安装脚本。别人按可靠性从高到低选：
 
 ```
-# 方式 A：直接 git 地址（installBundle 先 git ls-remote 检查，再交给 pnpm）
-plugin_manager: action=install_bundle, target=https://github.com/hgc357341051/dsh-mvp-xiaohuTem
+# 方式 A（最稳，完全不需要 git）：GitHub → Code → Download ZIP → 解压 → 装本地目录
+plugin_manager: action=install_bundle, target=<解压后的目录>
 
-# 方式 B：克隆后本地目录
+# 方式 B（需要 git，但只需 HTTPS）：克隆后本地目录
 git clone https://github.com/hgc357341051/dsh-mvp-xiaohuTem
 plugin_manager: action=install_bundle, target=<克隆目录>
 
-# 方式 C：发到 npm 后按包名安装（可选，需自行 npm publish）
+# 方式 C：直接 git 地址（会调用 git，可能回落 git+ssh）
+plugin_manager: action=install_bundle, target=github:hgc357341051/dsh-mvp-xiaohuTem
+
+# 方式 D：发到 npm 后按包名安装（可选，需自行 npm publish）
 plugin_manager: action=install_bundle, target=dsh-mvp-xiaohutem
 ```
 
-私有仓库/首次推送需要使用者本机的 GitHub 凭证可用。DSH 的 `installBundle` 对 GitHub
-目标先跑 `git ls-remote`（默认 5s 超时），再由 pnpm 拉取；包内 `files` 白名单决定最终内容。
+**为什么把 ZIP 排在第一位**：方式 C 由 pnpm 解析 `github:` 简写，会调用 `git ls-remote`，
+在缺 git 或没有 GitHub SSH 密钥的机器上会以 `Host key verification failed` /
+`'git' 不是内部或外部命令` 失败。本 bundle 是纯文件、无构建，ZIP + 本地目录安装绕开了
+整条 git/SSH 链路，是唯一不依赖本机 git 环境的路径。
+
+DSH 的 `installBundle` 对 GitHub 目标先跑 `git ls-remote`（默认 5s 超时），再由 pnpm 拉取；
+包内 `files` 白名单决定最终内容。
 
 ## 发布前检查
 

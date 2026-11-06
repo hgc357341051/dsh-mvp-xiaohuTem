@@ -7,27 +7,42 @@
 
 ## 安装
 
-在 DSH 的插件管理里安装本仓库。**请用下面这个 `github:` 形式**（pnpm 保存依赖时用的就是它）：
+本插件是**纯文件**的 Cordis bundle（零依赖、无构建、无安装脚本），因此只要把文件放到本机，
+用「本地目录」安装就一定能成功。三种方式按可靠性排序：
+
+### 方式 1（最稳，不需要 git）：下载 ZIP → 解压 → 本地目录安装
+
+GitHub 仓库页 → **Code** → **Download ZIP** → 解压，然后把解压出来的目录作为 `target`：
 
 ```
 plugin_manager: action=install_bundle
-target: github:hgc357341051/dsh-mvp-xiaohuTem
+target: <解压后的目录，例如 D:\plugins\dsh-mvp-xiaohuTem-main>
 ```
 
-也可以先克隆到本地，再把本地目录作为 `target` 安装（便于开发调试）：
+> ZIP 里没有 `.git`、没有 `prepare` 脚本，解压即可用。这条路径不依赖 git、SSH、npm、网络代理。
+
+### 方式 2（需要 git，但只需 HTTPS）：克隆后本地目录安装
 
 ```
 git clone https://github.com/hgc357341051/dsh-mvp-xiaohuTem
 plugin_manager: action=install_bundle, target=<克隆后的目录>
 ```
 
-安装到当前 DSH profile，影响该 profile 全部会话，重启后仍在。装好后：
+### 方式 3（最省事，但对本机环境有要求）：直接用 git 地址安装
+
+```
+plugin_manager: action=install_bundle
+target: github:hgc357341051/dsh-mvp-xiaohuTem
+```
+
+⚠️ 这条路径会调用 `git`，并可能回落到 `git+ssh://git@github.com/...`。**机器上没有 git、
+或 GitHub 没配 SSH 密钥时必然失败**（见下方排障）。不确定就用方式 1。
+
+### 装好后
 
 - 新会话预设选择器里选 **MVP 开发专家团**；
 - 或直接加载 skill `mvp-team-workflow` / 输入 `/mvp-team`；
 - Phase 看板出现在输入框下方。
-
-> 私有仓库或首次推送需要你本机的 GitHub 凭证可用；安装前宿主会先 `git ls-remote` 检查连通性。
 
 ### 安装后必须做的两件事
 
@@ -36,14 +51,15 @@ plugin_manager: action=install_bundle, target=<克隆后的目录>
 
 ### 排障
 
-| 现象 | 检查 |
+| 现象 | 含义与处理 |
 |---|---|
-| **提示「插件安装失败 / 无法从依赖变更中确定安装了哪一个包」** | 这不是安装失败，而是**它早就装好了**。见下方说明。 |
+| **「无法从依赖变更中确定安装了哪一个包」** | 不是安装失败，而是**它早就装好了**。见下方专门说明。 |
+| **`git ls-remote "git+ssh://git@github.com/..."` 退出码 1，或 `Host key verification failed`，或 `'git' 不是内部或外部命令`** | 本机缺 git 或没配 GitHub SSH 密钥。**改用方式 1（ZIP）**；或给该机器装 git 并 `ssh-keyscan github.com >> %USERPROFILE%\.ssh\known_hosts`（仍需 SSH 私钥）。 |
 | 预设选不了 / 列表里没有 | 确认安装返回 `application: applied`；开新会话；重启宿主后再看 |
 | skill / `mvp_team_*` 工具报错 | 确认 `list_plugins` 里 `include:mvp-team` 与 `include:preset-mvp-dev-expert-team` 都是 `fiberPhase: active`；用 `mvp_team_catalog` 验证 |
-| 看板空白或界面报错 | 打开浏览器控制台看是否有 `slot entry crashed`；看板是可选装饰，**它的失败不影响 skill / 工具 / preset** |
-| 安装返回 `already-installed` | 已装过。要重装/升级必须先 `remove_bundle`，再 `install_bundle` |
-| 安装返回 `network` / `failedAt: spec-host` | git 连通性问题（仓库不可达、无凭证、代理） |
+| 看板空白或界面报错 | 浏览器控制台看是否有 `slot entry crashed`；看板是可选装饰，**它的失败不影响 skill / 工具 / preset** |
+| 安装返回 `already-installed` | 已装过。要重装/升级先 `remove_bundle`，再 `install_bundle` |
+| 安装返回 `network` / `failedAt: spec-host` | 仓库不可达、无凭证或代理问题 |
 
 ### 为什么会出现「无法从依赖变更中确定安装了哪一个包」
 
@@ -52,9 +68,9 @@ plugin_manager: action=install_bundle, target=<克隆后的目录>
 
 1. `installBundle` 的「已安装」判断比对 spec 字符串，两种写法不相等，所以没有提前拦截；
 2. pnpm 实际解析到**同一个 commit**，输出 `Already up to date`、`added 0`；
-3. 依赖没有任何变化，管理器就无法从变更里识别出「装的是哪个包」，于是报这个错。
+3. 依赖没有任何变化，管理器无法从变更里识别出「装的是哪个包」，于是报这个错。
 
-**处理办法**：什么都不用做——插件已经在运行。直接开新会话使用；要换版本就先 `remove_bundle` 再装。
+**处理办法**：什么都不用做——插件已经在运行。直接开新会话使用；要换版本先 `remove_bundle` 再装。
 
 `plugin_manager` 的 `list_bundles` 里 `dsh-mvp-xiaohutem` 的 `enabled` 只代表保存的选择，不代表已成功加载；有 `error` 字段才是真的失败。
 
