@@ -41,8 +41,7 @@ target: github:hgc357341051/dsh-mvp-xiaohuTem
 ### 装好后
 
 - 新会话预设选择器里选 **MVP 开发专家团**；
-- 或直接加载 skill `mvp-team-workflow` / 输入 `/mvp-team`；
-- Phase 看板出现在输入框下方。
+- 或直接加载 skill `mvp-team-workflow` / 输入 `/mvp-team`。
 
 ### 安装后必须做的两件事
 
@@ -57,7 +56,6 @@ target: github:hgc357341051/dsh-mvp-xiaohuTem
 | **`git ls-remote "git+ssh://git@github.com/..."` 退出码 1，或 `Host key verification failed`，或 `'git' 不是内部或外部命令`** | 本机缺 git 或没配 GitHub SSH 密钥。**改用方式 1（ZIP）**；或给该机器装 git 并 `ssh-keyscan github.com >> %USERPROFILE%\.ssh\known_hosts`（仍需 SSH 私钥）。 |
 | 预设选不了 / 列表里没有 | 确认安装返回 `application: applied`；开新会话；重启宿主后再看 |
 | skill / `mvp_team_*` 工具报错 | 确认 `list_plugins` 里 `include:mvp-team` 与 `include:preset-mvp-dev-expert-team` 都是 `fiberPhase: active`；用 `mvp_team_catalog` 验证 |
-| 看板空白或界面报错 | 浏览器控制台看是否有 `slot entry crashed`；看板是可选装饰，**它的失败不影响 skill / 工具 / preset** |
 | 安装返回 `already-installed` | 已装过。要重装/升级先 `remove_bundle`，再 `install_bundle` |
 | 安装返回 `network` / `failedAt: spec-host` | 仓库不可达、无凭证或代理问题 |
 
@@ -85,8 +83,10 @@ target: github:hgc357341051/dsh-mvp-xiaohuTem
 | 7 个模型工具 | `mvp_team_brief` / `catalog` / `role` / `topic` / `reference` / `gate` / `recon_scope` |
 | 人类命令 | `/mvp-team [brief\|roles\|phases\|gate <phase>\|recon <idea>\|status]` |
 | Agent 预设 | `MVP 开发专家团`（项目总监人格），新会话预设选择器可选 |
-| Web UI | `conversation.composer.dock` 的 Phase 看板（含条件 1R 席位，中英双语，全主题 token） |
 | 显示资源 | `locale/{en,zh}.json`、原创 `icon.svg` |
+
+无 Web UI 组件：本插件刻意不注册任何界面。SOP / 角色 / 门禁全部通过 skill 与工具按需加载，
+一个静态的「流程展示卡片」对使用者没有实际帮助（不能读会话状态、不能触发动作），所以不做。
 
 渐进式加载：常驻 system prompt 只有一句指针，SOP / 角色 / 知识库按需 `skill` 加载，精确查询走工具。
 
@@ -136,13 +136,12 @@ REA 是**可选参考实现，不是依赖**；插件不执行安装、不写入
 **不需要额外构建步骤**。`files` 白名单决定发布包内容；本地目录安装不受其过滤，
 发布前请用 `npm pack --dry-run` 核对实际清单。
 
-发布前检查见 `CONTRIBUTING.md`：改包名需同步 4 处（`package.json`、`cordis.patch.yml`、
-`client.js` 的 module id、`index.js` 的 `SOURCE`），并替换 `LICENSE` 版权行。
+发布前检查见 `CONTRIBUTING.md`：改包名需同步 3 处（`package.json`、`cordis.patch.yml`、
+`index.js` 的 `SOURCE`），并替换 `LICENSE` 版权行。
 
 ## 已知边界
 
 - 门禁是「项目总监查询 + 机器校验 + 人工签字」，不是无条件全局拒绝的 guard；emoji 正则会误伤中文文案。
-- Client 看板的视觉呈现需在 Web UI 里确认；页面需认证时无法从外部截图验证。
 - 原资料作为**专业参考**改编保留，与统一契约冲突处以契约为准。
 
 ## 许可与来源

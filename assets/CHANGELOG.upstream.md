@@ -9,7 +9,7 @@ weiyou，版权声明见 `assets/LICENSE.upstream.txt`）。
 
 本插件对其进行了实质性改写：
 
-- 重写为 DeepSeek Harness / Cordis bundle（技能注册、模型工具、Agent 预设、Web 看板）；
+- 重写为 DeepSeek Harness / Cordis bundle（技能注册、模型工具、Agent 预设）；
 - 新增统一工作流契约，裁决原资料中的流程矛盾并补齐产物落盘契约；
 - 新增按需逆向分析席位（参考 [REA](https://github.com/morluto/rea)，MIT）；
 - 移除全部专有产品标识、专有编排机制与专有连接器依赖；所有第三方能力改为可选、

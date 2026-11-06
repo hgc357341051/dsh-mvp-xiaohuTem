@@ -6,7 +6,7 @@
 
 ```bash
 # 语法自检（任意 Node ≥18）
-node --check index.js && node --check client.js
+node --check index.js
 # JSON 自检（用 UTF-8 读，别用 PowerShell 的 ANSI 默认编码）
 node -e "for (const f of ['package.json','locale/en.json','locale/zh.json']) JSON.parse(require('fs').readFileSync(f,'utf8'))"
 # 核对发布包实际文件清单
@@ -14,7 +14,7 @@ npm pack --dry-run
 ```
 
 安装到当前 DSH profile：`plugin_manager` 的 `action=install_bundle`，`target` 传本仓库目录
-（本地开发）或本仓库的 git URL（分发）。修改 `index.js` / `client.js` / `cordis.patch.yml`
+（本地开发）或本仓库的 git URL（分发）。修改 `index.js` / `cordis.patch.yml`
 后需要重新启用 bundle 才会重建 Client 模块图：`set_bundle(enabled=false)` → `set_bundle(enabled=true)`。
 本地目录安装是 **link**，文件改动实时可见。
 
@@ -51,9 +51,8 @@ DSH 的 `installBundle` 对 GitHub 目标先跑 `git ls-remote`（默认 5s 超�
 1. **不要写死任何绝对路径**。包内资源一律用 `import.meta.url` 推导（见 `index.js` 的 `ROOT`）；
    项目产物一律相对会话 `working_directory`。`/mvp-team status`、`mvp_team_catalog`、
    `mvp_team_brief` 的输出不得包含本机路径。
-2. 若改 `package.json` 的 `name`，须同步 4 处：`cordis.patch.yml` 里 `mvp-team` 行的 `name`、
-   `client.js` 里 `window.__ModuleLoader__.load({ id })`、`index.js` 里 `SOURCE`、
-   以及 `README.md` 的安装示例。四处必须一致。
+2. 若改 `package.json` 的 `name`，须同步 3 处：`cordis.patch.yml` 里 `mvp-team` 行的 `name`、
+   `index.js` 里 `SOURCE`、以及 `README.md` 的安装示例。三处必须一致。
 3. 替换 `LICENSE` 的版权行；**保留**所有第三方署名（`assets/LICENSE.upstream.txt`、
    各 `references/01-standards/*.md` 头部、REA 说明）——这是 MIT 要求。
 4. 用 `npm pack --dry-run` 核对 `files` 白名单包含所有新增目录（尤其 `references/recon/`）。
@@ -74,7 +73,7 @@ DSH 的 `installBundle` 对 GitHub 目标先跑 `git ls-remote`（默认 5s 超�
 
 ## 验证清单
 
-- `node --check` 两个 JS 文件通过
+- `node --check index.js` 通过
 - 三个 JSON 可解析，且 `locale/*.json` 的 `meta.title` / `meta.description` 有意义
 - `icon.svg` ≤256 KiB、包内相对路径
 - `plugin_manager install_bundle` 返回 `application: applied` 且 `warnings: []`

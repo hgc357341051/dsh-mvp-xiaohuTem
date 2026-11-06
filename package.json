@@ -1,17 +1,15 @@
 {
   "name": "dsh-mvp-xiaohutem",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "type": "module",
   "description": "MVP Dev Expert Team for DeepSeek Harness: 8 standard roles plus a conditional reverse-engineering role, phased SOP, 31 knowledge-base references, gate tools, agent preset and a phase board.",
   "exports": {
     ".": "./index.js",
-    "./client": "./client.js",
     "./locale/*.json": "./locale/*.json",
     "./icon": "./icon.svg"
   },
   "files": [
     "index.js",
-    "client.js",
     "cordis.patch.yml",
     "icon.svg",
     "locale/*.json",
@@ -24,12 +22,7 @@
     "CONTRIBUTING.md"
   ],
   "dsh": {
-    "bundle": { "patch": "./cordis.patch.yml" },
-    "client": {
-      "platform": "web",
-      "immediately": true,
-      "inject": ["@deepseek-ai/dsh-client-ui-conversation"]
-    }
+    "bundle": { "patch": "./cordis.patch.yml" }
   },
   "license": "MIT",
   "repository": {
