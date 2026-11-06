@@ -1,0 +1,48 @@
+MIT License
+
+Copyright (c) 2026 hgc357341051 and dsh-mvp-xiaohuTem contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+Third-party material (retained as required by the MIT license)
+
+- `agents/role-*.md` (8 adapted briefs), `references/**` (30 adapted
+  knowledge-base documents) and `assets/CHANGELOG.upstream.md` are derived from
+  a MIT-licensed MVP team collaboration prompt collection, original author
+  weiyou (Copyright (c) 2026 weiyou). The verbatim upstream copyright and
+  permission notice are preserved in `assets/LICENSE.upstream.txt`. See
+  `assets/CHANGELOG.upstream.md` for a description of the adaptations.
+- `references/01-standards/` — 10 of 11 documents are adapted from the
+  [UmaDev](https://github.com/umacloud/umadev) knowledge base (MIT), as noted
+  in each file header.
+- `references/recon/rea-capability-matrix.md` describes
+  [REA / Reverse Engineer Anything](https://github.com/morluto/rea) (MIT) as
+  an OPTIONAL reference. No REA code is vendored. REA grants no license to
+  commercial tools (IDA Pro / Hex-Rays, Hopper, JEB); users must obtain those
+  legally themselves.
+
+Original to this repository: `skills/mvp-team-workflow.md`,
+`agents/role-recon.md`, `references/recon/`, `index.js`, `client.js`,
+`icon.svg`, `locale/*.json`, `cordis.patch.yml`, `package.json`, `README.md`
+and `CONTRIBUTING.md`.
+
+Third-party names appearing above identify the provenance of adapted material
+and do not imply endorsement, affiliation, or a runtime dependency.

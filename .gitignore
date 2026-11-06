@@ -1,0 +1,10 @@
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+# 本机 profile / 会话数据，绝不入库
+.dsh/
+*.asar
+# 打包产物
+*.tgz
+*.zip

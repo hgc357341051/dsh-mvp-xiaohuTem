@@ -1,0 +1,6 @@
+# npm 打包时排除开发期文件；`files` 白名单仍是主约束
+tmp/
+qa-tmp/
+.git/
+.gitignore
+CONTRIBUTING.md
