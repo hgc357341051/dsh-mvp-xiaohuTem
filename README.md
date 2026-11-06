@@ -29,6 +29,22 @@ plugin_manager: action=install_bundle, target=<克隆后的目录>
 
 > 私有仓库或首次推送需要你本机的 GitHub 凭证可用；安装前宿主会先 `git ls-remote` 检查连通性。
 
+### 安装后必须做的两件事
+
+1. **开一个新会话**。已经打开的会话保留启动时的插件/preset 修订，看不到新装的 preset，也看不到新注册的工具与 skill。
+2. **如果新会话仍看不到，重启宿主进程**（HMR 只重载已激活的模块，preset 与 Client 模块图的变更需要重启才完全生效）。
+
+### 排障
+
+| 现象 | 检查 |
+|---|---|
+| 预设选不了 / 列表里没有 | 确认安装返回 `application: applied` 且 `warnings: []`；开新会话；重启宿主后再看 |
+| skill / `mvp_team_*` 工具报错 | 确认 `list_plugins` 里 `include:mvp-team` 与 `include:preset-mvp-dev-expert-team` 都是 `fiberPhase: active`；用 `mvp_team_catalog` 验证 |
+| 看板空白或界面报错 | 打开浏览器控制台看是否有 `slot entry crashed`；看板是可选装饰，**它的失败不影响 skill / 工具 / preset** |
+| 安装失败 | 看 `install_bundle` 返回的 `error.code`（`already-installed` 需先 `remove_bundle`；`network` / `failedAt: spec-host` 是 git 连通性问题） |
+
+`plugin_manager` 的 `list_bundles` 里 `dsh-mvp-xiaohutem` 的 `enabled` 只代表保存的选择，不代表已成功加载；有 `error` 字段才是真的失败。
+
 ## 交付了什么
 
 | 能力 | 落点 |

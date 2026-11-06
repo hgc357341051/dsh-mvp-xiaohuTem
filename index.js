@@ -131,7 +131,7 @@ function topicContent(topic) {
         '- Legal boundary: analyze only software you own or are authorized to examine; no license circumvention, no unauthorized access.',
       ]
     : [
-        'Who reads what (upstream index, authoritative per references/README.md:49-60):',
+        'Who reads what (knowledge-base index, authoritative per references/README.md:49-60):',
         '',
         readSync('references/README.md'),
       ];
@@ -151,7 +151,10 @@ function topicContent(topic) {
 
 function registerSkill(ctx, skill) {
   const skills = ctx.get('skills');
-  if (!skills) return;
+  if (!skills) {
+    ctx.logger?.warn?.('mvp-team: skills service unavailable; role/knowledge-base skills not registered');
+    return;
+  }
   try {
     const disposer = skills.register(skill);
     ctx.effect(() => disposer, `mvp-team:skill:${skill.name}`);
@@ -171,10 +174,21 @@ function stringArg(name, description) {
 }
 
 export function apply(ctx) {
-  // 1. Progressive skill catalog: 1 authoritative SOP + 8 role briefs + 5 knowledge-base indexes.
+  try {
+    registerAll(ctx);
+  } catch (error) {
+    // A plugin fiber that throws during apply becomes inactive and contributes
+    // nothing. Contain unrecoverable failures so the diagnostic is visible
+    // instead of silently losing every skill and tool.
+    ctx.logger?.error?.(`mvp-team: activation failed: ${String(error)}`);
+  }
+}
+
+function registerAll(ctx) {
+  // 1. Progressive skill catalog: 1 authoritative SOP + 9 role briefs + 6 knowledge-base indexes.
   registerSkill(ctx, {
     name: 'mvp-team-workflow',
-    description: 'Authoritative DSH port of the MVP Dev Expert Team SOP: phases and gates, 8 standard roles plus a conditional reverse-engineering role, on-disk artifact contract, DSH tool mapping, portability rules and rulings on upstream contradictions. Load before any multi-phase MVP build.',
+    description: 'Authoritative DSH port of the MVP Dev Expert Team SOP: phases and gates, 8 standard roles plus a conditional reverse-engineering role, on-disk artifact contract, DSH tool mapping, portability rules and rulings on source-material contradictions. Load before any multi-phase MVP build.',
     whenToUse: 'When the user wants to build an MVP/product from an idea, or asks about the expert team workflow, phases, gates, roles or deliverables.',
     source: SOURCE,
     resourceBase: RESOURCE_BASE,
@@ -217,27 +231,38 @@ export function apply(ctx) {
   }
 
   // 3. A short always-visible pointer; the full SOP stays behind the skill.
+  // Every registration is isolated: a failure in one host service must never
+  // abort the remaining skills/tools/commands (a partially mounted plugin is
+  // far more useful than a plugin that mounts nothing).
   const systemPrompt = ctx.get('systemPrompt');
   if (systemPrompt) {
-    const disposer = systemPrompt.section({
-      name: 'mvp-team:brief',
-      order: 250,
-      interpolate: false,
-      text: 'The "MVP 开发专家团 / MVP Dev Expert Team" plugin is installed. When the user asks to build an MVP or a product from an idea, load the skill `mvp-team-workflow` and use the mvp_team_* tools. That skill is the single authoritative SOP; it resolves upstream contradictions and requires all deliverables to be written to disk. When the project involves an existing closed target, a protocol/file format, or third-party interop, call mvp_team_recon_scope to decide whether to seat the conditional reverse-engineering role.',
-    });
-    ctx.effect(() => disposer, 'mvp-team:prompt-section');
+    try {
+      const disposer = systemPrompt.section({
+        name: 'mvp-team:brief',
+        order: 250,
+        interpolate: false,
+        text: 'The "MVP 开发专家团 / MVP Dev Expert Team" plugin is installed. When the user asks to build an MVP or a product from an idea, load the skill `mvp-team-workflow` and use the mvp_team_* tools. That skill is the single authoritative SOP; it resolves contradictions in the adapted source material and requires all deliverables to be written to disk. When the project involves an existing closed target, a protocol/file format, or third-party interop, call mvp_team_recon_scope to decide whether to seat the conditional reverse-engineering role.',
+      });
+      ctx.effect(() => disposer, 'mvp-team:prompt-section');
+    } catch (error) {
+      ctx.logger?.warn?.(`mvp-team: failed to register prompt section: ${String(error)}`);
+    }
   }
 
   // 4. Human command surface.
   const commands = ctx.get('commands');
   if (commands) {
-    const disposer = commands.register({
-      name: 'mvp-team',
-      description: 'MVP 开发专家团 / MVP Dev Expert Team workflow, roles, phase gates and reverse-engineering scope.',
-      input: { hint: '[brief|roles|phases|gate <phase>|recon <idea>|status]' },
-      handler: ({ rawInput }) => ({ kind: 'success', text: commandText((rawInput ?? '').trim()) }),
-    });
-    ctx.effect(() => disposer, 'mvp-team:command');
+    try {
+      const disposer = commands.register({
+        name: 'mvp-team',
+        description: 'MVP 开发专家团 / MVP Dev Expert Team workflow, roles, phase gates and reverse-engineering scope.',
+        input: { hint: '[brief|roles|phases|gate <phase>|recon <idea>|status]' },
+        handler: ({ rawInput }) => ({ kind: 'success', text: commandText((rawInput ?? '').trim()) }),
+      });
+      ctx.effect(() => disposer, 'mvp-team:command');
+    } catch (error) {
+      ctx.logger?.warn?.(`mvp-team: failed to register command: ${String(error)}`);
+    }
   }
 }
 
@@ -245,13 +270,13 @@ function buildTools() {
   return [
     definition(
       'mvp_team_brief',
-      'Return the authoritative DSH workflow contract for the MVP Dev Expert Team, including rulings on the upstream contradictions, the artifact contract and the DSH tool mapping. Use before starting a multi-phase MVP build.',
+      'Return the authoritative DSH workflow contract for the MVP Dev Expert Team, including rulings on contradictions in the adapted source material, the artifact contract and the DSH tool mapping. Use before starting a multi-phase MVP build.',
       { type: 'object', properties: {}, additionalProperties: false },
       async () => safeRead(join(ROOT, CONTRACT)),
     ),
     definition(
       'mvp_team_catalog',
-      'List the expert roles (8 upstream + 1 conditional reverse-engineering), knowledge-base topics, and workflow phases with their gates. Returns a compact directory; use a mvp-role-* / mvp-team-* skill, mvp_team_gate or mvp_team_recon_scope to load one in full.',
+      'List the expert roles (8 standard + 1 conditional reverse-engineering), knowledge-base topics, and workflow phases with their gates. Returns a compact directory; use a mvp-role-* / mvp-team-* skill, mvp_team_gate or mvp_team_recon_scope to load one in full.',
       { type: 'object', properties: {}, additionalProperties: false },
       async () => JSON.stringify({
         contract: 'skill:mvp-team-workflow',
@@ -383,6 +408,6 @@ function commandText(arg) {
     `Topics (${TOPICS.length}): ${TOPICS.map(t => t.name).join(', ')}`,
     `Phases: ${PHASES.map(p => p.id).join(' -> ')}  (1.25 = conditional reverse engineering)`,
     '',
-    'All deliverables are written to disk relative to the current project root; docs/SPEC.md is locked at Phase 1.5. No install path, profile path or host tool is assumed. The workflow contract resolves upstream contradictions; do not follow the upstream SOP when it conflicts with the contract.',
+    'All deliverables are written to disk relative to the current project root; docs/SPEC.md is locked at Phase 1.5. No install path, profile path or host tool is assumed. The workflow contract resolves source-material contradictions; follow the contract when adapted material disagrees.',
   ].join('\n');
 }
