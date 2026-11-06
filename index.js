@@ -32,7 +32,6 @@ const TOPICS = [
 // existing closed target, a protocol/file format, or third-party interop.
 const PHASES = [
   { id: 0, name: '需求澄清', en: 'Clarify', seats: [], gates: ['一次性一轮提问并总结为 3 句话', '评估快速路径（轻量 / 迷你 / 标准）', '判定是否触发 Phase 1R 逆向席位'], user: '被问 1 次' },
-  { id: 0.5, name: '知识库探测', en: 'Knowledge base', seats: [], gates: ['可选 MCP；未配置即跳过', '调用前告知授权'], user: '仅授权告知' },
   { id: 1, name: '并行调研', en: 'Research', seats: ['pm', 'architect', 'designer'], gates: ['三文档落盘：docs/PRD.md、docs/ARCHITECTURE.md、docs/UIUX.md', '4 项一致性检查', 'P0 规则嵌入每份指令', '知识库全量表引用检查'], user: '唯一交互点：确认三文档' },
   { id: 1.25, name: '逆向分析（按需）', en: 'Reverse engineering (conditional)', seats: ['recon'], gates: ['授权确认（无授权即拒绝）', 'docs/recon/PLAN.md 定级与手段', 'docs/recon/REPORT.md 每条结论带 A/B/C 证据级别', '仅 A 级结论允许写入 Spec', '宿主能力探测：缺 REA 时按降级路径并降低证据级别'], user: '仅授权确认' },
   { id: 1.5, name: 'Spec 锁定', en: 'Spec lock', seats: [], gates: ['Lead 亲自生成 13 章 docs/SPEC.md 并落盘', '锁定一套图标库', 'OPEN-DECISIONS.md 与 DECISION-LOG.md 就位', '若启用 1R：把 A 级结论并入 Spec 并在第 13 章留痕'], user: '无' },
@@ -91,7 +90,7 @@ function roleContent(role) {
         '- Use DSH team mechanisms: spawn_teammate / team_task_* / send_message, or subagent / workflow as a fallback.',
         '- All `references/…` paths are relative to the plugin package root; load the matching mvp-team-* topic first, then read the file.',
         '- Write every deliverable to disk (see the artifact contract in docs/SPEC.md). Return RoleVerdict with evidence[].artifact_ref.',
-        '- Optional private knowledge bases and third-party tools must be probed, never assumed.',
+        '- Optional external capabilities and third-party tools must be probed, never assumed.',
         '- The authoritative SOP is skill `mvp-team-workflow`, which overrides any conflicting phase / gate / P0 rule below.',
       ]
     : [
@@ -296,8 +295,8 @@ function buildTools() {
     ),
     definition(
       'mvp_team_gate',
-      'Return the gate checklist for one workflow phase (0, 0.5, 1, 1.25, 1.5, 2, 3, 4): required artifacts, hard sidecar gates, seats and the user interaction point. Use it to verify a phase before advancing.',
-      { type: 'object', properties: { phase: stringArg('phase', 'Phase id: 0, 0.5, 1, 1.25, 1.5, 2, 3 or 4') }, required: ['phase'], additionalProperties: false },
+      'Return the gate checklist for one workflow phase (0, 1, 1.25, 1.5, 2, 3, 4): required artifacts, hard sidecar gates, seats and the user interaction point. Use it to verify a phase before advancing.',
+      { type: 'object', properties: { phase: stringArg('phase', 'Phase id: 0, 1, 1.25, 1.5, 2, 3 or 4') }, required: ['phase'], additionalProperties: false },
       async (args) => {
         const phase = PHASES.find(p => String(p.id) === String(args?.phase));
         if (!phase) return `Unknown phase "${String(args?.phase ?? '')}". Valid: ${PHASES.map(p => p.id).join(', ')}.`;

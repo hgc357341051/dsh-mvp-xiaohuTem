@@ -58,7 +58,7 @@ plugin_manager: action=install_bundle, target=dsh-mvp-xiaohutem
 |---|---|
 | 不引用本机盘符路径、用户主目录、profile 目录 | 别人的安装位置不同 |
 | 不引用宿主安装包内部路径 / profile 的 `node_modules` 位置 | 随宿主版本与安装方式变化 |
-| 不假设 REA / Hopper / JADX / adb / tshark / 私有知识库 MCP 已安装 | 用户环境不同；一律先探测、后降级 |
+| 不假设 REA / Hopper / JADX / adb / tshark 或任何 MCP server 已安装 | 用户环境不同；一律先探测、后降级 |
 | 不假设 `spawn_teammate` 等 team 工具一定存在 | 提供 `subagent` / `workflow` 降级 |
 | 不在 `engines.dsh` 写死版本下限 | 会让其他 DSH 版本被拒绝安装 |
 | `resourceBase` 只用于**包内**资源 | 项目产物必须走 `working_directory` |

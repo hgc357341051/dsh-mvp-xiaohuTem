@@ -152,15 +152,14 @@ Get-ChildItem -Recurse -Include *.tsx,*.vue,*.jsx,*.html src | Select-String -Pa
 | Phase | 动作 | 并行席位 | 门禁 | 用户节点 |
 |---|---|---|---|---|
 | 0 | 一次性一轮澄清（用户/场景/不做会怎样/参照/技术约束）→ 总结 3 句话；末了评估快速路径 | — | 不打扰 | **提问 1 次** |
-| 0.5 | 探测私有知识库（可选 MCP，未配置即跳过） | — | 调用前告知授权 | 仅授权告知 |
-| 1 | 三份文档并行调研 → 4 项一致性检查 → 提交三文档 | PM + 架构师 + 设计师（**按需并行** `recon`） | **用户确认三文档 = 唯一正式交互点**；P0 规则嵌入每份指令 | **确认门禁** |
+| 1 | 三份文档并行调研（联网 + 知识库基线）→ 4 项一致性检查 → 提交三文档 | PM + 架构师 + 设计师（**按需并行** `recon`） | **用户确认三文档 = 唯一正式交互点**；P0 规则嵌入每份指令 | **确认门禁** |
 | 1R（1.25，条件） | 授权确认 → 目标定级 → 取证 → 交叉验证 → 报告 | 逆向分析（`recon`） | 授权 mandatory；B/C 级结论不得进 Spec；缺 REA 时降级并降低证据级别 | 仅授权确认 |
 | 1.5 | Lead 亲自生成 13 章 Spec 并**落盘** `docs/SPEC.md` | — | 内部；必须锁定一套图标库；**若启用 1R，把 A 级结论并入 Spec 并在第 13 章留痕** | 无 |
 | 2 | API/DB 细化 + 每页设计提示词；**同时产出测试用例** | 架构师 + 设计师 + QA(写测试) | P0 扫描 + 反模式 13 项 + Spec 范围 + 知识库引用；`openapi.yaml` 与 `design-tokens.json` 存在性硬闸门 | 仅进度 |
 | 3 | 并行开发 + 自检修复 + 联调 | 前端 + 后端 | lint/type-check/test ≤3 轮；emoji 扫描；代码组织门禁（分层 / 单文件 ≤300 行 / 单一职责 / 入口只装配）；UI 11 项 | 仅进度 |
 | 4 | QA 验证评级 → P0 归零后才 DevOps 部署（严格串行） | QA → DevOps | 全量 P0 扫描、P0=0、health endpoint + 核心流程验证 | 交付通知 |
 
-**快速路径**：轻量（设计师 + 前端 + DevOps）/ 迷你（PM + 设计师 + 前端 + DevOps）/ 标准（完整 8 人 6 Phase）。快速路径跳过 QA 席位时，Phase 4 的 P0 扫描与评级**由 Lead 亲自执行并签字**，门禁项不减免。**1R 是条件席位，与快速路径正交**：标准/迷你/轻量任一路径只要触发逆向条件，Lead 都要安排 `recon`；不触发则三者都不安排。
+**快速路径**：轻量（设计师 + 前端 + DevOps）/ 迷你（PM + 设计师 + 前端 + DevOps）/ 标准（完整主 Phase 流程）。快速路径跳过 QA 席位时，Phase 4 的 P0 扫描与评级**由 Lead 亲自执行并签字**，门禁项不减免。**1R 是条件席位，与快速路径正交**：标准/迷你/轻量任一路径只要触发逆向条件，Lead 都要安排 `recon`；不触发则三者都不安排。
 
 **异常处理**：spawn 失败重试 1 次 → 换措辞 → 3 次失败通知用户；PM/架构/设计 15min 无回传催促、开发 30min；QA P0 两次打回不过由 Lead 介入；用户说「暂停」记录当前 Phase，说「继续」恢复；中途改需求回 Phase 0。
 
@@ -174,7 +173,6 @@ Get-ChildItem -Recurse -Include *.tsx,*.vue,*.jsx,*.html src | Select-String -Pa
 | 原资料的中文名 / 角色 ID 传参 | 改用 `mvp-role-*` skill 名或 kebab-case teammate 名；角色简报通过 skill 加载，不靠 UI 名称匹配 |
 | `Read` 读取 `references/…` | 先 `skill` 加载对应 `mvp-team-*` 索引，再 `read` 插件包内绝对路径（resourceBase 目录） |
 | `Bash` / `grep -rP` / `xargs` / `/tmp/` / `curl` | Windows 用 `pwsh` + `Select-String`；`grep` 工具；`web_fetch`；产物写工作区，不用 `/tmp/` |
-| 私有知识库 MCP | **完全可选**：等价于通用 MCP server 工具；未配置即跳过，不影响主流程。凭据放 `credentials`，不写入 config/代码 |
 | REA / 原生分析引擎 / adb / tshark / JADX | **全部可选，能力探测优先**：用会话实际工具列表决定；缺失时降级到 `glob`/`grep`/`read`/`pwsh`/`web_fetch` 并降低证据级别。插件不安装、不配置、不假定路径 |
 | `Write` / `Edit` | `write` / `edit` / `glob` / `grep` |
 | 用户询问 | `ask_user_question`；三文档确认可用 UI 审批卡 |

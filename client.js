@@ -64,7 +64,6 @@ window.__ModuleLoader__.load({
 
     const phases = [
       { id: '0', zh: '需求澄清', en: 'Clarify', seats: [], gates: ['一轮提问 → 3 句话', '评估快速路径'], user: 'One clarification round' },
-      { id: '0.5', zh: '知识库探测', en: 'Knowledge base', seats: [], gates: ['Optional MCP; skip if absent', '告知授权'], user: 'Authorization notice' },
       { id: '1', zh: '并行调研', en: 'Research', seats: ['pm', 'architect', 'designer'], gates: ['docs/PRD.md', 'docs/ARCHITECTURE.md', 'docs/UIUX.md', '一致性检查'], user: '唯一交互点：确认三文档' },
       { id: '1R', zh: '逆向分析（按需）', en: 'Recon (conditional)', seats: ['recon'], conditional: true, gates: ['授权确认（无授权即拒绝）', 'docs/recon/PLAN.md 定级', 'docs/recon/REPORT.md 带 A/B/C 证据', '仅 A 级结论可进 Spec', '不假设 REA 已安装'], user: '仅授权确认' },
       { id: '1.5', zh: 'Spec 锁定', en: 'Spec lock', seats: [], gates: ['13 章 docs/SPEC.md 落盘', '锁定图标库', 'OPEN-DECISIONS / DECISION-LOG'], user: 'None' },
