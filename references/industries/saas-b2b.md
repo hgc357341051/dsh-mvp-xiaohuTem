@@ -40,7 +40,7 @@
 - **UI 框架**：Tailwind CSS + Radix UI / Headless UI
 - **后端**：FastAPI / Express + PostgreSQL
 - **认证**：JWT + RBAC
-- **部署**：Vercel / CloudBase + 云数据库
+- **部署**：Vercel / 云开发平台 + 云数据库
 
 ## 行业数据参考
 - 用户留存率：30日 40-60%

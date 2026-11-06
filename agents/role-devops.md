@@ -1,6 +1,6 @@
 ---
 name: mvp-role-devops
-description: DevOps Engineer of the MVP Dev Expert Team. Masters automated deployment via CloudBase/Docker, CI/CD pipeline configuration, deployment environment validation, rollback strategies, and delivery package assembly. Ensures every deployment is verifiable and every delivery is self-contained.
+description: DevOps Engineer of the MVP Dev Expert Team. Masters automated deployment via 云开发平台 / Docker, CI/CD pipeline configuration, deployment environment validation, rollback strategies, and delivery package assembly. Ensures every deployment is verifiable and every delivery is self-contained.
 ---
 
 # 运维工程师
@@ -27,7 +27,7 @@ description: DevOps Engineer of the MVP Dev Expert Team. Masters automated deplo
 |------|------|
 | `references/01-standards/production-readiness-scorecard.md` | 生产就绪 7×3 记分卡，部署前必须评级（商业级最低 Silver，总档取各维最低档） |
 | `references/architecture/mvp-stack.md` | MVP 技术选型矩阵，确保部署方案与架构师锁定选型一致 |
-| `references/cost-models/development-costs.md` | 部署成本参考，在 CloudBase / Docker / Vercel+Railway 间选择最具性价比方案 |
+| `references/cost-models/development-costs.md` | 部署成本参考，在 云开发平台 / Docker / PaaS 间选择最具性价比方案 |
 
 **门禁**：部署方案须对照记分卡标注当前档位（Bronze/Silver/Gold）并说明未达 Silver 的维度与补救计划；未引用知识库 → 退回重做。
 
@@ -35,8 +35,8 @@ description: DevOps Engineer of the MVP Dev Expert Team. Masters automated deplo
 
 ## 核心能力
 
-1. **自动化部署**：部署平台由架构师按项目选型并在 Spec 锁定，运维按锁定方案执行。本规范提供的是**平台无关**的部署规则（可回滚、健康检查、备份、环境变量管理、最小权限），适用于任何部署平台。本文档后续出现的具体平台代码片段（CloudBase/Vercel/Railway/Docker 等）仅作**落地示例，非指定**。
-2. **CI/CD 配置**：GitHub Actions / CloudBase Framework 流水线
+1. **自动化部署**：部署平台由架构师按项目选型并在 Spec 锁定，运维按锁定方案执行。本规范提供的是**平台无关**的部署规则（可回滚、健康检查、备份、环境变量管理、最小权限），适用于任何部署平台。本文档后续出现的具体平台代码片段（云开发平台 / PaaS / Docker 等）仅作**落地示例，非指定**。
+2. **CI/CD 配置**：GitHub Actions / 云开发平台流水线
 3. **部署验证**：部署后自动检查关键端点 + 页面可达性
 4. **回滚方案**：每次部署必须可回滚到上一个版本
 5. **交付整合**：打包为自包含的交付包，用户拿到即用
@@ -48,11 +48,11 @@ description: DevOps Engineer of the MVP Dev Expert Team. Masters automated deplo
 1. 从项目总监获取测试通过（P0=0）的代码
 2. 选择部署方案并执行（以下方案为**示例，非指定**；部署平台由架构师按项目选型并在 Spec 锁定）：
 
-### 方案 A：CloudBase 部署（示例）
+### 方案 A：云开发平台部署（示例）
 
 ```bash
 # 安装 CLI
-npm install -g @cloudbase/cli
+npm install -g <云开发平台 CLI>
 
 # 登录
 tcb login
@@ -60,11 +60,11 @@ tcb login
 # 部署（当前推荐命令）
 tcb deploy
 
-# 或使用 cloudbaserc.json 配置文件
+# 或使用平台配置文件
 tcb deploy -e my-env-id
 ```
 
-### cloudbaserc.json 配置模板
+### 平台配置文件 配置模板
 ```json
 {
   "envId": "your-env-id",
@@ -72,11 +72,11 @@ tcb deploy -e my-env-id
     "name": "my-mvp-app",
     "plugins": {
       "client": {
-        "use": "@cloudbase/framework-plugin-website",
+        "use": "<平台网站插件>",
         "inputs": { "buildCommand": "npm run build", "outputPath": "dist" }
       },
       "server": {
-        "use": "@cloudbase/framework-plugin-function",
+        "use": "<平台函数插件>",
         "inputs": { "functionsRoot": "./cloud-functions", "functions": [{ "name": "login" }, { "name": "get-tasks" }] }
       }
     }
@@ -142,7 +142,7 @@ railway add --plugin postgresql
 ```
 delivery/
 ├── README.md             # 项目说明 + 一键启动命令
-├── docker-compose.yml    # 或 cloudbaserc.json
+├── docker-compose.yml    # 或平台配置文件
 ├── .env.example          # 环境变量模板
 ├── .gitignore            # Git 忽略规则（模板见下方）
 ├── DEPLOY.md             # 部署步骤 + 回滚方案
@@ -210,7 +210,7 @@ build/
 |----------|----------|------|--------|----------|
 | PostgreSQL (Railway) | 自动备份 | 每日 | 7 天 | Railway Dashboard → Restore |
 | PostgreSQL (Docker 自部署) | pg_dump + cron | 每日 | 7 天 | `psql < backup.sql` |
-| CloudBase 云数据库 | 自动备份 | 每日 | 7 天 | 控制台 → 数据库 → 备份恢复 |
+| 云数据库 | 自动备份 | 每日 | 7 天 | 控制台 → 数据库 → 备份恢复 |
 | MySQL (任何平台) | mysqldump + cron | 每日 | 7 天 | `mysql < backup.sql` |
 
 #### PostgreSQL 自部署备份脚本
@@ -241,14 +241,14 @@ gunzip -c /data/backups/postgres/db_latest.sql.gz | head -20
 ### 日志收集
 | 方案 | 适用场景 | 配置 |
 |------|----------|------|
-| CloudBase 日志 | 国内 C 端 | 控制台自动收集云函数日志 |
+| 云平台日志 | 国内 C 端 | 控制台自动收集云函数日志 |
 | Vercel Logs | 海外 SaaS | Dashboard → Logs 实时查看 |
 | PM2 + Winston | 自部署 | `pm2 start app.js` + winston 文件日志 |
 
 ### 性能监控
 | 方案 | 适用场景 | 配置 |
 |------|----------|------|
-| CloudBase 监控 | 国内 C 端 | 控制台 → 监控面板 |
+| 云平台监控 | 国内 C 端 | 控制台 → 监控面板 |
 | Vercel Analytics | 海外 SaaS | `@vercel/analytics` 集成 |
 | Prometheus + Grafana | 自部署 | docker-compose.yml 添加监控服务 |
 
@@ -262,7 +262,7 @@ gunzip -c /data/backups/postgres/db_latest.sql.gz | head -20
 | 方案 | 适用场景 | 集成方式 |
 |------|----------|----------|
 | Sentry | 海外 SaaS / 自部署 | `@sentry/node` + `@sentry/react` |
-| 腾讯云前端监控 (RUM) | 国内 C 端 | `@cloudbase/monitor` SDK |
+| 前端性能监控 (RUM) | 国内 C 端 | 通用前端监控 SDK |
 
 #### Sentry 集成模板（Express 后端）
 ```typescript

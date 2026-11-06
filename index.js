@@ -352,7 +352,7 @@ function phaseArtifacts(id) {
     case '1.5': return ['docs/SPEC.md', 'docs/decisions/OPEN-DECISIONS.md', 'docs/decisions/DECISION-LOG.md'];
     case '2': return ['docs/api/openapi.yaml', 'docs/decisions/ADR-XXX.md', 'DESIGN.md', 'design-system/MASTER.md', 'design-system/design-tokens.json', 'design-system/design-tokens.css', 'tests/ (QA test cases)'];
     case '3': return ['src/types/api.d.ts', 'mocks/', 'frontend + backend source', 'docs/mvp-team/memory/pitfalls.jsonl'];
-    case '4': return ['delivery/TEST_REPORT.md', 'delivery/README.md', 'delivery/DEPLOY.md', 'delivery/USER_GUIDE.md', 'delivery/.env.example', 'delivery/.gitignore', 'delivery/docker-compose.yml | cloudbaserc.json'];
+    case '4': return ['delivery/TEST_REPORT.md', 'delivery/README.md', 'delivery/DEPLOY.md', 'delivery/USER_GUIDE.md', 'delivery/.env.example', 'delivery/.gitignore', 'delivery/docker-compose.yml | 平台配置文件'];
     default: return [];
   }
 }

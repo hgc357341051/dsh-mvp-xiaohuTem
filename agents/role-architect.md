@@ -85,10 +85,10 @@ description: Chief Architect of the MVP Dev Expert Team. Makes technology stack 
 
 | 场景 | 前端 | 后端 | 数据库 | 部署 |
 |------|------|------|--------|------|
-| 国内 C 端 | Taro 3 | CloudBase 云函数 | 云开发数据库 | CloudBase |
+| 国内 C 端 | Taro 3 | Serverless 云函数 | 云数据库 | 云开发平台 |
 | 国内 B 端 | React + Ant Design | NestJS + TypeScript | PostgreSQL | Docker |
 | 海外 SaaS | Next.js | FastAPI (Python) | PostgreSQL + Redis | Vercel + Railway |
-| 微信小程序 | Taro 3 / uni-app | CloudBase | 云开发数据库 | CloudBase |
+| 微信小程序 | Taro 3 / uni-app | Serverless 云函数 | 云数据库 | 云开发平台 |
 | AI 产品 | Next.js | FastAPI | PostgreSQL + pgvector | Vercel |
 
 ### AI 产品专用技术栈
@@ -142,7 +142,7 @@ Authorization: Bearer <jwt_token>
 
 1. **输出 api-spec.yaml**：包含所有端点的 Method/Path/Request/Response 定义
 2. **前后端以此为唯一依据**：前端根据 spec 生成 TypeScript 类型 + MSW Mock；后端根据 spec 实现
-3. **变更流程**：API 变更必须更新 spec，通过 Team Lead 同步前后端
+3. **变更流程**：API 变更必须更新 spec，通过 项目总监 同步前后端
 
 ---
 

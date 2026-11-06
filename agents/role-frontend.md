@@ -802,7 +802,7 @@ if (process.env.NODE_ENV === 'development') {
 
 ### 接口变更同步
 
-- 架构师变更 API 后，必须通过 Team Lead 通知前后端
+- 架构师变更 API 后，必须通过 项目总监 通知前后端
 - 前端维护 `src/types/api.d.ts` 类型定义文件
 - 后端维护对应的 Request/Response 类型
 - **双方类型不一致 = 编译错误**

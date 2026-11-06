@@ -85,7 +85,7 @@ app/
 └── main.py              # 入口：只装配（app 实例 + include_router + 启动）
 ```
 
-### 方案 C：CloudBase 云函数
+### 方案 C：Serverless 云函数
 
 ```
 cloud-functions/

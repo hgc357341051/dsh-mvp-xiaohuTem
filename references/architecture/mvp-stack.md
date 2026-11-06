@@ -21,7 +21,7 @@
 | Nest.js | Node.js | ★★★★ | ★★★★ | 企业级/微服务 |
 | Gin | Go | ★★★★ | ★★★★★ | 高并发/API 网关 |
 | Spring Boot | Java | ★★★ | ★★★★★ | 企业级/金融 |
-| CloudBase | 腾讯云 | ★★★★★ | ★★★ | 小程序/快速上线 |
+| 云开发平台 | 各云厂商 | ★★★★★ | ★★★ | 小程序/快速上线 |
 
 ## 数据库选型
 
@@ -39,16 +39,16 @@
 | 方案 | 成本 | MVP 推荐 | 适用场景 |
 |------|------|----------|----------|
 | Vercel | 免费→$20/月 | ★★★★★ | Next.js 前端 |
-| CloudBase | 免费→按量 | ★★★★★ | 小程序+后端 |
+| 云开发平台 | 免费→按量 | ★★★★★ | 小程序+后端 |
 | Docker + 云服务器 | ¥50-200/月 | ★★★★ | 通用 |
-| 腾讯云 Serverless | 按量付费 | ★★★★ | API 服务 |
+| Serverless 函数 | 按量付费 | ★★★★ | API 服务 |
 | Railway | $5/月起 | ★★★★ | 全栈快速部署 |
 
 ## AI 能力接入
 
 | 方案 | 成本 | 延迟 | 适用场景 |
 |------|------|------|----------|
-| 腾讯混元 API | ¥0.01/千token | 1-3s | 通用对话/文本 |
+| 大语言模型 API | 按量计费 | 1-3s | 通用对话/文本 |
 | DeepSeek API | ¥0.001/千token | 2-5s | 代码/推理 |
 | OpenAI API | $0.01/千token | 1-3s | 通用/多模态 |
 | 本地 Ollama | 免费 | 视硬件 | 隐私/离线 |
@@ -59,13 +59,13 @@
 Next.js 14 + Tailwind + Radix UI + FastAPI + PostgreSQL + Vercel
 
 ### 电商小程序
-Taro 3 + Vue 3 + CloudBase + MySQL + 微信支付
+Taro 3 + Vue 3 + 云开发平台 + MySQL + 微信支付
 
 ### 内容平台
 Nuxt 3 + Tailwind + FastAPI + PostgreSQL + MeiliSearch
 
 ### AI 应用/Agent
-Next.js 14 + FastAPI + Redis + 混元/DeepSeek + CloudBase
+Next.js 14 + FastAPI + Redis + 大语言模型 API + 云开发平台
 
 ### 鸿蒙应用
 ArkTS + ArkUI + HTTP + 关系型DB + Push Kit

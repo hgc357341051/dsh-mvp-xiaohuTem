@@ -74,7 +74,7 @@ FastAPI 目录模板（示例）见 `references/01-standards/code-organization.m
 
 ## 核心能力
 
-1. **项目搭建**：技术栈由架构师按项目选型并在 Spec 锁定，后端按锁定栈实现。本规范提供的是**技术栈无关**的后端规则（分层/目录/错误处理/安全/性能/事务/幂等），适用于任何后端技术。本文档后续出现的具体技术代码片段（Express/FastAPI/CloudBase 等）仅作**落地示例，非指定**。
+1. **项目搭建**：技术栈由架构师按项目选型并在 Spec 锁定，后端按锁定栈实现。本规范提供的是**技术栈无关**的后端规则（分层/目录/错误处理/安全/性能/事务/幂等），适用于任何后端技术。本文档后续出现的具体技术代码片段（Express / FastAPI / Serverless 等）仅作**落地示例，非指定**。
 2. **API 实现**：按架构师清单逐个实现端点
 3. **数据库**：Schema 迁移、索引优化、查询性能
 4. **安全加固**：认证鉴权、RBAC 权限、输入消毒、速率限制（具体方案由架构师选型）
@@ -157,12 +157,12 @@ app.add_middleware(
 )
 ```
 
-#### CloudBase 方案
-- 云函数在 `cloudbaserc.json` 中配置 `cors` 字段
+#### Serverless 方案
+- 云函数在平台配置文件中配置 `cors` 字段
 - 或在云函数代码中手动设置响应头：
   ```javascript
   exports.main = async (event, context) => {
-    // CloudBase 自动处理 CORS，无需额外配置
+    // 云函数网关自动处理 CORS，无需额外配置
     // 如需自定义：在 event.headers 中处理 OPTIONS 预检
   }
   ```
@@ -250,7 +250,7 @@ router.get('/api/tasks', authenticate, cacheMiddleware(300), async (req, res) =>
 - 每份迁移必须可回滚（down migration）
 - 上线前先在 staging 环境跑一遍迁移
 
-## CloudBase 云函数开发（示例 — 当架构师选定 CloudBase 方案时参考）
+## Serverless 云函数开发（示例 — 当架构师选定 Serverless 方案时参考）
 
 ### 项目结构
 ```
@@ -303,7 +303,7 @@ exports.main = async (event, context) => {
 | 场景 | 方案 | 说明 |
 |------|------|------|
 | 聊天/协作 | WebSocket (Socket.IO) | Express 方案 |
-| 聊天/协作 | CloudBase 实时数据监听 | CloudBase 方案 |
+| 聊天/协作 | 实时数据推送 | Serverless 方案 |
 | 通知推送 | SSE (Server-Sent Events) | 单向推送 |
 
 ### WebSocket 示例（Express + Socket.IO）
@@ -321,7 +321,7 @@ io.on('connection', (socket) => {
 })
 ```
 
-### CloudBase 实时数据监听
+### 实时数据推送
 ```javascript
 // 前端使用 Taro 的实时监听
 const watcher = db.collection('messages')
@@ -339,7 +339,7 @@ const watcher = db.collection('messages')
 | 场景 | 推荐方案 | 说明 |
 |------|----------|------|
 | 海外 SaaS | Resend / SendGrid | Resend 免费额度 100 封/天，开发者友好 |
-| 国内 C 端 | 腾讯云 SES / 阿里云邮件推送 | 国内到达率高 |
+| 国内 C 端 | 邮件推送服务 | 国内到达率高 |
 | 自部署 | Nodemailer + SMTP | 使用企业邮箱 SMTP 发送 |
 
 #### Express + Resend 邮件模板
@@ -401,13 +401,13 @@ router.get('/api/notifications', authenticate, async (req, res) => {
 | 场景 | 方案 |
 |------|------|
 | 海外 SaaS | AWS S3 / Cloudflare R2 |
-| 国内 C 端 | 腾讯云 COS |
+| 国内 C 端 | 对象存储服务 |
 
-### COS 上传示例（CloudBase 方案）
+### 对象存储上传示例
 ```javascript
 // 后端生成上传签名
 exports.getUploadSignature = async (data) => {
-  const cos = new COS({ SecretId, SecretKey })
+  const store = new ObjectStorage({ accessKey, secretKey })
   return new Promise((resolve, reject) => {
     cos.getObjectUrl({
       Bucket: 'my-bucket',
@@ -441,7 +441,7 @@ router.post('/api/upload', authenticate, upload.single('file'), async (req, res)
 
 ### 微信小程序登录
 ```javascript
-// CloudBase 云函数
+// Serverless 云函数
 exports.wxLogin = async (data) => {
   const { code } = data
   // 用 code 换取 openid + session_key
@@ -453,7 +453,7 @@ exports.wxLogin = async (data) => {
 }
 ```
 
-### 微信支付（CloudBase）
+### 支付接入（Serverless 示例）
 ```javascript
 exports.createPayment = async (data, context) => {
   const { orderId, amount, description } = data

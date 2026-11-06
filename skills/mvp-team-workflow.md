@@ -124,7 +124,7 @@ Get-ChildItem -Recurse -Include *.tsx,*.vue,*.jsx,*.html src | Select-String -Pa
 | `src/types/api.d.ts`、`mocks/` | 前端 | 联调 | 与 openapi.yaml 对齐 |
 | `tests/`、`tests/regression/<缺陷>.test.ts` | QA | Phase 4 门禁 | 反作弊：测试文件不得被删除、断言数不得下降 |
 | `delivery/TEST_REPORT.md` | QA | DevOps 交付 | P0 缺陷数为 0 |
-| `delivery/` 7 文件（README / docker-compose.yml 或 cloudbaserc.json / .env.example / .gitignore / DEPLOY.md / TEST_REPORT.md / USER_GUIDE.md） | DevOps | 用户 | 全部存在 + 自包含 |
+| `delivery/` 7 文件（README / docker-compose.yml 或 平台配置文件 / .env.example / .gitignore / DEPLOY.md / TEST_REPORT.md / USER_GUIDE.md） | DevOps | 用户 | 全部存在 + 自包含 |
 | `docs/mvp-team/memory/pitfalls.jsonl` | Lead（Phase 1/3 沉淀） | 后续 Phase 召回 | signature / family / episode_count / validated，≤300 条 |
 | `docs/recon/PLAN.md` | 逆向分析（1R） | Lead 门禁 | 目标类型、拟用手段、前置条件、预期证据形式、授权状态 |
 | `docs/recon/REPORT.md` | 逆向分析（1R） | 架构师、QA、Spec | 每条结论带 A/B/C 级别 + 命令/输入/输出/时间 + 局限；含合规声明 |
@@ -171,7 +171,7 @@ Get-ChildItem -Recurse -Include *.tsx,*.vue,*.jsx,*.html src | Select-String -Pa
 | 原包机制 | DSH 替代 |
 |---|---|
 | 原资料的团队创建 / 成员派生 / 消息回传 | 优先 `spawn_teammate` + `team_task_create` / `team_task_update` + `send_message` + `wait_agent`（若当前会话具备 team 工具）；否则 `subagent` / `subagent_fork` / `workflow` 的 `parallel` / `pipeline` 降级。**注意 subagent 有派生深度上限，Lead 应为根会话或走 agentTeams** |
-| `name` / `subagent_type` 传中文名 | 传 `mvp-role-*` skill 名或 kebab-case teammate 名；角色简报通过 skill 加载，不靠 UI 名称匹配 |
+| 原资料的中文名 / 角色 ID 传参 | 改用 `mvp-role-*` skill 名或 kebab-case teammate 名；角色简报通过 skill 加载，不靠 UI 名称匹配 |
 | `Read` 读取 `references/…` | 先 `skill` 加载对应 `mvp-team-*` 索引，再 `read` 插件包内绝对路径（resourceBase 目录） |
 | `Bash` / `grep -rP` / `xargs` / `/tmp/` / `curl` | Windows 用 `pwsh` + `Select-String`；`grep` 工具；`web_fetch`；产物写工作区，不用 `/tmp/` |
 | 私有知识库 MCP | **完全可选**：等价于通用 MCP server 工具；未配置即跳过，不影响主流程。凭据放 `credentials`，不写入 config/代码 |

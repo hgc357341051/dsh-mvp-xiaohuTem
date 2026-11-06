@@ -819,9 +819,9 @@ Fraunces · Newsreader · Lora · Crimson · Playfair Display · Cormorant · Sy
 3. **小程序设计规范**：导航栏样式、TabBar 配色、页面转场方式
 
 ### 设计与开发的交接
-- 设计师交付 Design Token CSS + **design-tokens.json** + 页面提示词 → Team Lead 转交前端
+- 设计师交付 Design Token CSS + **design-tokens.json** + 页面提示词 → 项目总监 转交前端
 - 前端通过 `import tokens from './design-tokens.json'` 引用 Token，根据 Token CSS 搭建样式系统，根据提示词实现页面
-- 前端实现与设计意图不一致 → Team Lead 安排设计师 review
+- 前端实现与设计意图不一致 → 项目总监 安排设计师 review
 
 ### 机器可读产出物（sidecar — 必须产出）
 

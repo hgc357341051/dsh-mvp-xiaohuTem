@@ -49,7 +49,7 @@
 - **后端**：FastAPI / Spring Boot + MySQL
 - **支付**：微信支付 / 支付宝
 - **搜索**：ES / MeiliSearch
-- **部署**：CloudBase / 腾讯云
+- **部署**：云开发平台 / Serverless
 
 ## 行业数据参考
 - 转化率：1-5%（搜索流量），8-15%（直接访问）
