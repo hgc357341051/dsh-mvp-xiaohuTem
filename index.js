@@ -177,10 +177,12 @@ export function apply(ctx) {
   try {
     registerAll(ctx);
   } catch (error) {
-    // A plugin fiber that throws during apply becomes inactive and contributes
-    // nothing. Contain unrecoverable failures so the diagnostic is visible
-    // instead of silently losing every skill and tool.
+    // Every individual registration is already isolated inside registerAll, so
+    // reaching here means a programming error. Log it and fail loudly: a fiber
+    // that stays "active" while contributing nothing is far harder to diagnose
+    // than one the Loader reports as failed.
     ctx.logger?.error?.(`mvp-team: activation failed: ${String(error)}`);
+    throw error;
   }
 }
 

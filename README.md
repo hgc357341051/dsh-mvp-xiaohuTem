@@ -7,14 +7,14 @@
 
 ## 安装
 
-在 DSH 的插件管理里安装本仓库（git 地址会被 `installBundle` 交给 pnpm 拉取）：
+在 DSH 的插件管理里安装本仓库。**请用下面这个 `github:` 形式**（pnpm 保存依赖时用的就是它）：
 
 ```
 plugin_manager: action=install_bundle
-target: https://github.com/hgc357341051/dsh-mvp-xiaohuTem
+target: github:hgc357341051/dsh-mvp-xiaohuTem
 ```
 
-或先克隆到本地，再把本地目录作为 `target` 安装（便于开发）：
+也可以先克隆到本地，再把本地目录作为 `target` 安装（便于开发调试）：
 
 ```
 git clone https://github.com/hgc357341051/dsh-mvp-xiaohuTem
@@ -38,10 +38,23 @@ plugin_manager: action=install_bundle, target=<克隆后的目录>
 
 | 现象 | 检查 |
 |---|---|
-| 预设选不了 / 列表里没有 | 确认安装返回 `application: applied` 且 `warnings: []`；开新会话；重启宿主后再看 |
+| **提示「插件安装失败 / 无法从依赖变更中确定安装了哪一个包」** | 这不是安装失败，而是**它早就装好了**。见下方说明。 |
+| 预设选不了 / 列表里没有 | 确认安装返回 `application: applied`；开新会话；重启宿主后再看 |
 | skill / `mvp_team_*` 工具报错 | 确认 `list_plugins` 里 `include:mvp-team` 与 `include:preset-mvp-dev-expert-team` 都是 `fiberPhase: active`；用 `mvp_team_catalog` 验证 |
 | 看板空白或界面报错 | 打开浏览器控制台看是否有 `slot entry crashed`；看板是可选装饰，**它的失败不影响 skill / 工具 / preset** |
-| 安装失败 | 看 `install_bundle` 返回的 `error.code`（`already-installed` 需先 `remove_bundle`；`network` / `failedAt: spec-host` 是 git 连通性问题） |
+| 安装返回 `already-installed` | 已装过。要重装/升级必须先 `remove_bundle`，再 `install_bundle` |
+| 安装返回 `network` / `failedAt: spec-host` | git 连通性问题（仓库不可达、无凭证、代理） |
+
+### 为什么会出现「无法从依赖变更中确定安装了哪一个包」
+
+这个包在 profile 里已保存为 `github:hgc357341051/dsh-mvp-xiaohuTem`。如果再用**另一种写法**
+（例如 `https://github.com/hgc357341051/dsh-mvp-xiaohuTem`）去安装：
+
+1. `installBundle` 的「已安装」判断比对 spec 字符串，两种写法不相等，所以没有提前拦截；
+2. pnpm 实际解析到**同一个 commit**，输出 `Already up to date`、`added 0`；
+3. 依赖没有任何变化，管理器就无法从变更里识别出「装的是哪个包」，于是报这个错。
+
+**处理办法**：什么都不用做——插件已经在运行。直接开新会话使用；要换版本就先 `remove_bundle` 再装。
 
 `plugin_manager` 的 `list_bundles` 里 `dsh-mvp-xiaohutem` 的 `enabled` 只代表保存的选择，不代表已成功加载；有 `error` 字段才是真的失败。
 
