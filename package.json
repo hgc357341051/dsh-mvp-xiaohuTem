@@ -1,6 +1,6 @@
 {
   "name": "dsh-mvp-xiaohutem",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "type": "module",
   "description": "MVP Dev Expert Team for DeepSeek Harness: 8 standard roles plus a conditional reverse-engineering role, phased SOP, 31 knowledge-base references, gate tools, agent preset and a phase board.",
   "exports": {
