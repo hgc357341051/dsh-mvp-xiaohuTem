@@ -15,12 +15,39 @@ window.__ModuleLoader__.load({
         if (state.phase === 'running') return;
         setState({ phase: 'running', message: '' });
         try {
-          const remote = (typeof ctx !== 'undefined' && ctx.remote) ? ctx.remote : undefined;
-          if (!remote || !remote.commands) throw new Error('commands remote unavailable');
-          const result = await remote.commands.execute('/compact');
-          const text = result && typeof result.text === 'string' ? result.text
-            : (result === undefined || result === null) ? '已触发压缩。' : JSON.stringify(result);
-          setState({ phase: 'done', message: text });
+          // The commands surface lives somewhere under the client ctx; probe the
+          // actual shapes instead of guessing a namespace. Preference order:
+          // ctx.remote.commands.execute → ctx.commands.execute → host.call fallback.
+          const c = (typeof ctx !== 'undefined') ? ctx : undefined;
+          const candidates = [];
+          if (c && c.remote && c.remote.commands && typeof c.remote.commands.execute === 'function') {
+            candidates.push(['ctx.remote.commands.execute', () => c.remote.commands.execute('/compact')]);
+          }
+          if (c && c.commands && typeof c.commands.execute === 'function') {
+            candidates.push(['ctx.commands.execute', () => c.commands.execute('/compact')]);
+          }
+          if (typeof host !== 'undefined' && typeof host.call === 'function') {
+            candidates.push(['host.call(compact)', () => host.call('compact')]);
+          }
+          if (!candidates.length) {
+            const shape = c ? `ctx keys: [${Object.keys(c).join(', ')}]`
+              + (c.remote ? ` | remote keys: [${Object.keys(c.remote).join(', ')}]` : ' | no ctx.remote')
+              : 'no client ctx';
+            throw new Error(`no command surface found. ${shape}`);
+          }
+          let lastError = null;
+          for (const [name, attempt] of candidates) {
+            try {
+              const result = await attempt();
+              const text = result && typeof result.text === 'string' ? result.text
+                : (result === undefined || result === null) ? '已触发压缩。' : JSON.stringify(result);
+              setState({ phase: 'done', message: `${name}: ${text}` });
+              return;
+            } catch (error) {
+              lastError = `${name}: ${String(error && error.message || error)}`;
+            }
+          }
+          throw new Error(lastError || 'all attempts failed');
         } catch (error) {
           setState({ phase: 'error', message: String(error && error.message || error) });
         }
