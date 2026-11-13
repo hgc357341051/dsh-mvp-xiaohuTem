@@ -91,7 +91,11 @@ window.__ModuleLoader__.load({
     }
 
     return {
-      inject: ['slots', 'remote', 'commands'],
+      // Only slots is a hard inject. remote/commands are NOT declared here:
+      // declaring them makes the whole client half wait for services that may
+      // never appear on the client side, which silently kills the button.
+      // Instead the click handler probes ctx defensively at click time.
+      inject: ['slots'],
       apply(clientCtx) {
         capturedCtx = clientCtx;
         return clientCtx.slots.inject('conversation.input.left', () =>
