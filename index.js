@@ -165,6 +165,42 @@ function registerSkill(ctx, skill) {
 
 const OUTPUT = { schema: { type: 'string' }, render: (_args, value) => [{ type: 'text', text: typeof value === 'string' ? value : JSON.stringify(value, null, 2) }] };
 
+// Tool results accumulate in the session log and each model step re-sends the
+// whole request body; some LLM gateways reject bodies over 8 MB with HTTP 413.
+// Keep one tool result small by writing the full document to disk and returning
+// a bounded head plus the file path, so the model reads only what it needs.
+const RESULT_HEAD_CHARS = 12000;
+const RESULT_HEAD_LINES = 200;
+
+async function boundedResult(text, label) {
+  const body = typeof text === 'string' ? text : JSON.stringify(text, null, 2);
+  if (body.length <= RESULT_HEAD_CHARS) return body;
+  const os = await import('node:os');
+  const { writeFile, mkdir } = await import('node:fs/promises');
+  const dir = join(os.tmpdir?.() ?? '.', 'mvp-team-bounded');
+  try { await mkdir(dir, { recursive: true }); } catch { /* exists */ }
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const safe = String(label || 'result').replace(/[^a-z0-9_-]+/gi, '_').slice(0, 60);
+  const file = join(dir, `${safe}-${stamp}.txt`);
+  try {
+    await writeFile(file, body, 'utf8');
+    const head = body.slice(0, RESULT_HEAD_CHARS);
+    const cutAt = head.lastIndexOf('\n', RESULT_HEAD_LINES * 0 + RESULT_HEAD_CHARS) > 0 ? head.lastIndexOf('\n') : RESULT_HEAD_CHARS;
+    return [
+      `[bounded result] full document is ${body.length} chars; saved to:`,
+      `  ${file}`,
+      `Read it with the read tool (offset/limit supported) instead of re-fetching.`,
+      `--- head (${cutAt} of ${body.length} chars) ---`,
+      head.slice(0, cutAt),
+      `--- truncated ---`,
+    ].join('\n');
+  } catch (error) {
+    // Disk write failed: fall back to an inline hard cut, never throw.
+    return `${body.slice(0, RESULT_HEAD_CHARS)}\n--- truncated (full ${body.length} chars; write failed: ${String(error)}) ---`;
+  }
+}
+
+
 function definition(name, description, parameters, execute) {
   return { name, description, parameters, output: OUTPUT, execute };
 }
@@ -272,9 +308,9 @@ function buildTools() {
   return [
     definition(
       'mvp_team_brief',
-      'Return the authoritative DSH workflow contract for the MVP Dev Expert Team, including rulings on contradictions in the adapted source material, the artifact contract and the DSH tool mapping. Use before starting a multi-phase MVP build.',
+      'Return the authoritative DSH workflow contract for the MVP Dev Expert Team, including rulings on contradictions in the adapted source material, the artifact contract and the DSH tool mapping. Use before starting a multi-phase MVP build. Output is bounded: if the contract exceeds the inline limit the head is returned and the full text path is given for targeted reads.',
       { type: 'object', properties: {}, additionalProperties: false },
-      async () => safeRead(join(ROOT, CONTRACT)),
+      async () => boundedResult(await safeRead(join(ROOT, CONTRACT)), 'mvp-team-contract'),
     ),
     definition(
       'mvp_team_catalog',
@@ -289,12 +325,12 @@ function buildTools() {
     ),
     definition(
       'mvp_team_role',
-      'Load one expert role brief (full agent markdown) plus the applicability note. Role ids: team-lead, pm, designer, architect, frontend, backend, qa, devops, recon. "recon" is a conditional seat authored by this bundle.',
+      'Load one expert role brief (full agent markdown) plus the applicability note. Role ids: team-lead, pm, designer, architect, frontend, backend, qa, devops, recon. "recon" is a conditional seat authored by this bundle. Output is bounded: the head is returned inline and the full brief path is given for targeted reads (a full brief can exceed 40 KB).',
       { type: 'object', properties: { role: stringArg('role', 'Exact role id, e.g. "architect"') }, required: ['role'], additionalProperties: false },
       async (args) => {
         const role = ROLES.find(r => r.id === args?.role);
         if (!role) return `Unknown role "${String(args?.role ?? '')}". Valid ids: ${ROLES.map(r => r.id).join(', ')}.`;
-        return roleContent(role);
+        return boundedResult(roleContent(role), `role-${role.id}`);
       },
     ),
     definition(
@@ -310,14 +346,14 @@ function buildTools() {
     ),
     definition(
       'mvp_team_reference',
-      'Read one knowledge-base reference file from the plugin package by its relative path, e.g. "references/01-standards/spec-as-contract.md". Paths outside the package are rejected.',
+      'Read one knowledge-base reference file from the plugin package by its relative path, e.g. "references/01-standards/spec-as-contract.md". Paths outside the package are rejected. Prefer this over loading a whole topic: single files can still exceed 30 KB, so output is bounded with the full text written to a temp file.',
       { type: 'object', properties: { path: stringArg('path', 'Package-relative path under references/ or agents/') }, required: ['path'], additionalProperties: false },
       async (args) => {
         const rel = String(args?.path ?? '').replace(/\\/g, '/');
         const abs = resolve(ROOT, rel);
         if (!abs.startsWith(ROOT + sep) && abs !== ROOT) return 'Rejected: path escapes the plugin package.';
         if (!(rel.startsWith('references/') || rel.startsWith('agents/') || rel === CONTRACT)) return 'Rejected: only references/, agents/ and the workflow contract are readable.';
-        return safeRead(abs);
+        return boundedResult(await safeRead(abs), rel.replace(/[^a-z0-9_-]+/gi, '_'));
       },
     ),
     definition(
