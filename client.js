@@ -8,6 +8,10 @@ window.__ModuleLoader__.load({
     // host's /compact command through the commands Remote surface; the result
     // text is shown in a small transient line under the button. The button is
     // a thin trigger over the host command: no compaction logic lives here.
+    // The ctx/host builtins are injected into apply(), not into component scope.
+    // Capture the client context here so the button closure can use it.
+    let capturedCtx = null;
+
     function CompactButton() {
       const [state, setState] = React.useState({ phase: 'idle', message: '' });
 
@@ -15,10 +19,7 @@ window.__ModuleLoader__.load({
         if (state.phase === 'running') return;
         setState({ phase: 'running', message: '' });
         try {
-          // The commands surface lives somewhere under the client ctx; probe the
-          // actual shapes instead of guessing a namespace. Preference order:
-          // ctx.remote.commands.execute → ctx.commands.execute → host.call fallback.
-          const c = (typeof ctx !== 'undefined') ? ctx : undefined;
+          const c = capturedCtx;
           const candidates = [];
           if (c && c.remote && c.remote.commands && typeof c.remote.commands.execute === 'function') {
             candidates.push(['ctx.remote.commands.execute', () => c.remote.commands.execute('/compact')]);
@@ -26,13 +27,13 @@ window.__ModuleLoader__.load({
           if (c && c.commands && typeof c.commands.execute === 'function') {
             candidates.push(['ctx.commands.execute', () => c.commands.execute('/compact')]);
           }
-          if (typeof host !== 'undefined' && typeof host.call === 'function') {
-            candidates.push(['host.call(compact)', () => host.call('compact')]);
+          if (c && c.remote && typeof c.remote.commands === 'function') {
+            candidates.push(['ctx.remote.commands(fn)', () => c.remote.commands('/compact')]);
           }
           if (!candidates.length) {
             const shape = c ? `ctx keys: [${Object.keys(c).join(', ')}]`
               + (c.remote ? ` | remote keys: [${Object.keys(c.remote).join(', ')}]` : ' | no ctx.remote')
-              : 'no client ctx';
+              : 'no client ctx captured';
             throw new Error(`no command surface found. ${shape}`);
           }
           let lastError = null;
@@ -92,6 +93,7 @@ window.__ModuleLoader__.load({
     return {
       inject: ['slots'],
       apply(clientCtx) {
+        capturedCtx = clientCtx;
         return clientCtx.slots.inject('conversation.input.left', () =>
           clientCtx.slots.register({
             name: 'conversation.input.left',
