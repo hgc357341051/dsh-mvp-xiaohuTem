@@ -63,6 +63,8 @@
             name: '@deepseek-ai/dsh-tool-present'
           - id: tool-ask-user
             name: '@deepseek-ai/dsh-tool-ask-user'
+          - id: command-compact
+            name: '@deepseek-ai/dsh-command-compact'
           - id: compaction
             name: cordis:group
             group: true
