@@ -91,7 +91,7 @@ window.__ModuleLoader__.load({
     }
 
     return {
-      inject: ['slots'],
+      inject: ['slots', 'remote'],
       apply(clientCtx) {
         capturedCtx = clientCtx;
         return clientCtx.slots.inject('conversation.input.left', () =>
