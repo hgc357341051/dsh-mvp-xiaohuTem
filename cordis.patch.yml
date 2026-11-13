@@ -63,8 +63,6 @@
             name: '@deepseek-ai/dsh-tool-present'
           - id: tool-ask-user
             name: '@deepseek-ai/dsh-tool-ask-user'
-          - id: command-compact
-            name: '@deepseek-ai/dsh-command-compact'
           - id: compaction
             name: cordis:group
             group: true
@@ -89,6 +87,10 @@
                   # CJK-heavy sessions underprice tokens in the meter's heuristic;
                   # cap the summary output explicitly instead of following headroom.
                   maxTokens: 16384
+              # Lives inside the compaction realm: /compact needs compactNow from
+              # the same isolated group (mirrors presets/standard.patch.yml).
+              - id: command-compact
+                name: '@deepseek-ai/dsh-command-compact'
               - id: tool-result-pruner
                 name: '@deepseek-ai/dsh-compaction-tool-result-pruner'
                 config:
