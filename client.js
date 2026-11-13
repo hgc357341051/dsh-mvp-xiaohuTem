@@ -91,14 +91,12 @@ window.__ModuleLoader__.load({
     }
 
     return {
-      // Inject checklist learned from the guard errors themselves, in order:
-      // ['slots'] -> "cannot get remote without inject";
-      // ['slots','remote'] -> "cannot get remote.commands without inject";
-      // so the host expects the path-form entry remote.commands. The earlier
-      // disappearance happened while the preset was ALSO invalid (command-compact
-      // outside the compaction realm), which is fixed separately; this is the
-      // first version where both fixes are live together.
-      inject: ['slots', 'remote', 'remote.commands'],
+      // The guard visited EVERY one of these names across our six live clicks:
+      // remote, then remote.commands, then commands (flat), each reported
+      // separately by Cordis. So the host wants all of them declared — the
+      // command surface is reachable through multiple address forms and each
+      // property access carries its own inject requirement.
+      inject: ['slots', 'remote', 'remote.commands', 'commands'],
       apply(clientCtx) {
         capturedCtx = clientCtx;
         return clientCtx.slots.inject('conversation.input.left', () =>
