@@ -91,11 +91,14 @@ window.__ModuleLoader__.load({
     }
 
     return {
-      // Only slots is a hard inject. remote/commands are NOT declared here:
-      // declaring them makes the whole client half wait for services that may
-      // never appear on the client side, which silently kills the button.
-      // Instead the click handler probes ctx defensively at click time.
-      inject: ['slots'],
+      // Inject checklist learned from the guard errors themselves, in order:
+      // ['slots'] -> "cannot get remote without inject";
+      // ['slots','remote'] -> "cannot get remote.commands without inject";
+      // so the host expects the path-form entry remote.commands. The earlier
+      // disappearance happened while the preset was ALSO invalid (command-compact
+      // outside the compaction realm), which is fixed separately; this is the
+      // first version where both fixes are live together.
+      inject: ['slots', 'remote', 'remote.commands'],
       apply(clientCtx) {
         capturedCtx = clientCtx;
         return clientCtx.slots.inject('conversation.input.left', () =>
