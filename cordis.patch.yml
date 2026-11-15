@@ -70,23 +70,14 @@
               compaction: true
               toolResultPruner: true
             config:
+              # Compaction realm mirrors presets/standard.patch.yml. The stock
+              # compaction-basic row carries no explicit tuning: when the optional
+              # dsh-live-compact bundle is installed it swaps this row in place
+              # (takeoverPresets) and applies its own defaults; without it the
+              # stock engine runs with stock defaults. command-compact must stay
+              # inside the realm so /compact reaches the active engine.
               - id: compaction-basic
                 name: '@deepseek-ai/dsh-compaction-basic'
-                config:
-                  # Compact far earlier than the stock 0.8 threshold. This preset is
-                  # used against local LLM gateways with a hard HTTP request-body cap
-                  # (e.g. 8 MB), which byte-measures the whole history while compaction
-                  # measures tokens against a very large declared context window (up to
-                  # ~1M tokens). At 0.8 the trigger point sits far above what the
-                  # gateway accepts, so requests fail with 413 before compaction ever
-                  # fires. 0.35 starts condensing while history is still small; the
-                  # pruner below trims oversized tool results first, so the summary
-                  # model call is often avoided entirely.
-                  thresholdRatio: 0.35
-                  retainRatio: 0.12
-                  # CJK-heavy sessions underprice tokens in the meter's heuristic;
-                  # cap the summary output explicitly instead of following headroom.
-                  maxTokens: 16384
               # Lives inside the compaction realm: /compact needs compactNow from
               # the same isolated group (mirrors presets/standard.patch.yml).
               - id: command-compact
